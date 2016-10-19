@@ -1,47 +1,59 @@
 #include <sys/types.h>
+#include <sys/time.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 
-void inline printForkTime(clock_t before, clock_t after);
 
-int main()
-{
-	clock_t secBeforeFork, secAfterFork;
+typedef struct timeval timeval;
+
+void inline getTime(timeval *t); 
+void inline printForkTime(timeval *before, timeval *after); 
+
+int main() 
+{ 
+	timeval beforeFork, afterFork; 
 	float a[1000000];
-
-	secBeforeFork = clock();
+	
+	getTime(&beforeFork); 
 	
 	if (fork() > 0)
 	{
-		secAfterFork = clock();
+		getTime(&afterFork);
 	
-		printf("If Child don't use big varible ");
-		printForkTime(secBeforeFork, secAfterFork);
+		printf("If Child don't use big varible, Parent fork time: ");
+		printForkTime(&beforeFork, &afterFork);
 		
-		secBeforeFork = clock();
+		getTime(&beforeFork);
 
 		if( fork() > 0)
-		{
-			secAfterFork = clock();
+		{		
+			getTime(&afterFork);
 			
-			printf("If Child use big varible ");
-			printForkTime(secBeforeFork, secAfterFork);
+			printf("If Child use big varible, Parent fork time: ");
+			printForkTime(&beforeFork, &afterFork);
 		}
 		else
 		a[31] = 1234;
-
 	}
-
+	
 	return 0;
 }
 
-void printForkTime(clock_t before, clock_t after)
+void getTime(timeval *t)
 {
-	if ((before == -1) || (after == -1))
-	printf("Can't count fork time\n");
-	else
-	printf("fork time: %f seconds\n", 
-				(float)(after - before) / CLOCKS_PER_SEC);
+	static struct timezone tz;
+
+	if (gettimeofday(t, &tz) == -1)
+	{
+		printf("Can't get time\n");
+		exit(EXIT_FAILURE);
+	}
+}
+
+void printForkTime(timeval *before, timeval *after)
+{
+
+	printf("%ld microseconds\n", (after->tv_sec - before->tv_sec)/1000000 + 
+								 after->tv_usec - before->tv_usec);
 }
