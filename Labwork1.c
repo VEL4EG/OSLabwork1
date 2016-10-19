@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define ELEM_COUNT 1000000
+
 typedef struct timeval timeval;
 
 void inline getTime(timeval *t); 
@@ -12,7 +14,10 @@ void inline printForkTime(timeval *before, timeval *after);
 int main() 
 { 
 	timeval beforeFork, afterFork; 
-	float a[1000000];
+	float a[ELEM_COUNT];
+
+	for (int i = 0; i < ELEM_COUNT; i++)
+	a[i] = i;
 	
 	getTime(&beforeFork); 
 	
