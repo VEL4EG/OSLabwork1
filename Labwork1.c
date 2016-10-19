@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
 typedef struct timeval timeval;
 
 void inline getTime(timeval *t); 
@@ -34,9 +33,23 @@ int main()
 			printForkTime(&beforeFork, &afterFork);
 		}
 		else
-		a[31] = 1234;
+		{
+			a[31] = 1234;
+
+			getTime(&afterFork);
+		
+			printf("If Child use big varible, Child fork time: ");
+			printForkTime(&beforeFork, &afterFork);
+		}
+
 	}
+	else
+	{
+		getTime(&afterFork);
 	
+		printf("If Child don't use big varible, Child fork time: ");
+		printForkTime(&beforeFork, &afterFork);
+	}
 	return 0;
 }
 
